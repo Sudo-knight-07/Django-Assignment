@@ -1,0 +1,43 @@
+By default, Django signals are executed synchronously. This means that when a signal is sent, all the connected receivers are executed immediately in the same thread, 
+and the code execution waits for them to complete before moving forward.
+
+To demonstrate this, let's use an example with Django's built-in signals: post_save for a model.
+
+1. Create a Django Model and Signal Receiver
+
+from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import time
+
+class MyModel(models.Model):
+    name = models.CharField(max_length=100)
+
+@receiver(post_save, sender=MyModel)
+def my_signal_receiver(sender, instance, **kwargs):
+    print("Signal receiver started.")
+    time.sleep(5)  # Simulate a long-running process
+    print("Signal receiver finished.")
+
+2. Create a New Instance of MyModel
+
+# Assume this code runs in a Django shell or view.
+instance = MyModel.objects.create(name="Test Instance")
+print("Model instance saved.")
+
+Expected Output:
+Signal receiver started.
+Signal receiver finished.
+Model instance saved.
+
+-The print statements "Signal receiver started." and "Signal receiver finished." come from the my_signal_receiver function.
+-The print statement "Model instance saved." is executed after the signal receiver has completed its execution.
+-This shows that the code execution waits for the signal receiver to finish before proceeding, which conclusively proves that Django signals are executed synchronously by default.
+
+
+
+
+
+
+
+
